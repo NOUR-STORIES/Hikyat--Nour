@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NOUR STORIES</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";const firebaseConfig = {
+  apiKey: "AIzaSyD7UxdOH50zHivnIGld1l0nHYSSFroWovo",
+  authDomain: "nour-stories.firebaseapp.com",
+  databaseURL: "https://nour-stories-default-rtdb.firebaseio.com",
+  projectId: "nour-stories",
+  storageBucket: "nour-stories.firebasestorage.app",
+  messagingSenderId: "852070300591",
+  appId: "1:852070300591:web:1c3d1d774492447f190d5a",
+  measurementId: "G-QLPYHDDG2M"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const storyRef = ref(db, "stories");
+
+const storyList = document.getElementById("story-list");
+
+onValue(storyRef, (snapshot) => {
+  storyList.innerHTML = "";
+  snapshot.forEach((child) => {
+    const story = child.val();
+    const div = document.createElement("div");
+    div.className = "story-title";
+    div.innerHTML = `<span>[${story.type}] ${story.title}</span>`;
+
+    const details = document.createElement("div");
+    details.className = "story-details";
+
+    if (story.events) {
+      details.innerHTML += `<p><strong>أحداث:</strong> ${story.events}</p>`;
+    }
+    if (story.pdf) {
+      details.innerHTML += `<a class="pdf-link" href="${story.pdf}" target="_blank">فتح ملف PDF</a>`;
+    }
+
+    div.addEventListener("click", () => {
+      details.style.display =
+        details.style.display === "block" ? "none" : "block";
+    });
+
+    storyList.appendChild(div);
+    storyList.appendChild(details);
+  });
+});
+
+window.addStory = function (e) {
+  e.preventDefault();
+  const type = document.getElementById("type").value;
+  const title = document.getElementById("title").value;
+  const events = document.getElementById("events").value;
+  const pdf = document.getElementById("pdf").value;
+
+  if (!type || !title) {
+    alert("يرجى تعبئة نوع القصة والعنوان على الأقل.");
+    return;
+  }
+
+  push(storyRef, {
+    type,
+    title,
+    events,
+    pdf
+  });
+
+  document.getElementById("type").value = "";
+  document.getElementById("title").value = "";
+  document.getElementById("events").value = "";
+  document.getElementById("pdf").value = "";
+}
+
+  </script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 50%, #91eae4 100%);
+      color: #222;
+    }
+    header {
+      background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
+      color: #fff;
+      padding: 25px 20px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    nav {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      font-weight: 700;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+    nav a {
+      color: #f0e9ff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: #ffd1dc;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .story-title {
+      padding: 12px 20px;
+      margin: 12px 0;
+      background: #f9f8ff;
+      border-radius: 12px;
+      border: 2px solid #a18cd1;
+      cursor: pointer;
+      color: #764ba2;
+      font-weight: 700;
+    }
+    .story-details {
+      display: none;
+      background: #f3f2ff;
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 15px rgba(118, 75, 162, 0.2);
+      color: #4a3d6f;
+    }
+    .pdf-link {
+      display: inline-block;
+      margin-top: 10px;
+      font-weight: 700;
+      color: #764ba2;
+      text-decoration: none;
+    }
+    .pdf-link:hover {
+      color: #a18cd1;
+      text-decoration: underline;
+    }
+    .add-form {
+      background: #f3f2ff;
+      border: 2px solid #a18cd1;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 30px;
+    }
+    .add-form label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 700;
+      color: #764ba2;
+    }
+    .add-form input[type="text"],
+    .add-form textarea,
+    .add-form select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border-radius: 12px;
+      border: 1.5px solid #a18cd1;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1rem;
+    }
+    .add-form button {
+      margin-top: 20px;
+      padding: 15px 20px;
+      background: #764ba2;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(118, 75, 162, 0.7);
+      transition: background 0.3s ease;
+    }
+    .add-form button:hover {
+      background: #a18cd1;
+    }
+    footer {
+      text-align: center;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      color: #f0e9ff;
+      padding: 35px 20px;
+      margin-top: 40px;
+      font-weight: 700;
+      box-shadow: 0 -5px 20px rgba(102, 126, 234, 0.5);
+      border-radius: 15px 15px 0 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📚 Welcome to NOUR STORIES</h1>
+  </header>  <nav>
+    <a href="#home">الرئيسية</a>
+    <a href="#add">إضافة قصة</a>
+    <a href="#contact">تواصل معنا</a>
+  </nav>  <div class="container" id="home">
+    <h2>القصص المنشورة</h2>
+    <div id="story-list"></div>
+  </div>  <div class="container" id="add">
+    <h2>أضف قصة جديدة</h2>
+    <form class="add-form" onsubmit="addStory(event)">
+      <label for="type">نوع القصة:</label>
+      <select id="type" required>
+        <option value="">اختر النوع</option>
+        <option>رعب</option>
+        <option>كوميدي</option>
+        <option>رومانسية</option>
+        <option>أنمي</option>
+        <option>أطفال</option>
+        <option>خيال</option>
+        <option>إثارة</option>
+      </select><label for="title">عنوان القصة:</label>
+  <input type="text" id="title" required />
+
+  <label for="events">أحداث القصة (اختياري):</label>
+  <textarea id="events" rows="4"></textarea>
+
+  <label for="pdf">رابط ملف PDF (اختياري):</label>
+  <input type="text" id="pdf" placeholder="https://example.com/story.pdf" />
+
+  <button type="submit">نشر القصة</button>
+</form>
+
+  </div>  <div class="container" id="contact">
+    <h2>تواصل معنا</h2>
+    <p><a href="https://www.facebook.com/groups/923265078199578/?ref=share&mibextid=NSMWBT" target="_blank">رابط مجموعة فيسبوك</a></p>
+    <p><strong>رقم الدعم:</strong> 01505352632</p>
+    <p>الشكاوى والاقتراحات مفتوحة على مدار الساعة.</p>
+  </div>  <footer>
+    تم التطوير بواسطة nourebrahimnoureldeen © 2025
+  </footer>
+</body>
+</html>
